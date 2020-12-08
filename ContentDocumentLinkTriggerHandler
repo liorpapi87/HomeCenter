@@ -1,0 +1,40 @@
+public with sharing class ContentDocumentLinkTriggerHandler {
+
+    public static void afterInsert(List<ContentDocumentLink> newList) {
+        markFileUploaded(newList);
+    }
+
+    public static void markFileUploaded(List<ContentDocumentLink> newList) {
+
+        List<Id> contentDocumentIds = new List<Id>();
+        for(ContentDocumentLink contentDocumentLink_i : newList) {
+            if(contentDocumentLink_i.ContentDocumentId != null && contentDocumentLink_i.LinkedEntityId != null && contentDocumentLink_i.LinkedEntityId.getSObjectType() == HC_Order__c.sObjectType) {
+                contentDocumentIds.add(contentDocumentLink_i.ContentDocumentId);
+            }
+        }
+        
+        List<ContentDocument> contentDocumentList = [SELECT Id, Title FROM ContentDocument WHERE Id IN :contentDocumentIds];
+        List<Id> contentDocumentIdsIO = new List<Id>();
+        for(ContentDocument contentDocument_i : contentDocumentList) {
+      
+                contentDocumentIdsIO.add(contentDocument_i.id);
+            
+        }
+
+        List<Id> HCOrderIdList = new List<Id>();
+        for(ContentDocumentLink contentDocumentLink_i : newList) {
+            if(contentDocumentIdsIO.contains(contentDocumentLink_i.ContentDocumentId)) {
+                HCOrderIdList.add(contentDocumentLink_i.LinkedEntityId);
+            }
+        }
+
+        List<HC_Order__c> HCOrderList= [ SELECT Id, Name, File_Uploaded__c
+                                                               FROM HC_Order__c
+                                                               WHERE Id IN :HCOrderIdList];
+        for(HC_Order__c hcorder_i : HCOrderList) {
+            hcorder_i.File_Uploaded__c = true;
+        }
+
+        update HCOrderList;
+    }
+}
