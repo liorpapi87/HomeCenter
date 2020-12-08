@@ -1,0 +1,577 @@
+Component
+
+<aura:component implements="lightning:availableForFlowScreens" access="global">
+
+    <aura:attribute name="imageName" type="string"  />
+
+   
+
+    <aura:attribute name="imageAlt" type="string"  />
+
+  
+
+    <!-- Style -->
+
+    <aura:attribute name="styleWidth" type="string" default="" />
+
+    <aura:attribute name="styleHeight" type="string" default="" />
+
+    <aura:attribute name="styleMaxWidth" type="string" default="" />
+
+    <aura:attribute name="styleMaxHeight" type="string" default="" />
+
+   
+
+    <aura:attribute name="styleBorderRadius" type="string" default="0" />
+
+    <aura:attribute name="styleBorderStyle" type="string" default="solid" />
+
+    <aura:attribute name="styleBorderWidth" type="string" default="0px" />
+
+    <aura:attribute name="styleBorderColor" type="string" default="" />
+
+   
+
+    <aura:attribute name="styleMarginTop" type="string" default="0" />
+
+    <aura:attribute name="styleMarginRight" type="string" default="0" />
+
+    <aura:attribute name="styleMarginBottom" type="string" default="0" />
+
+    <aura:attribute name="styleMarginLeft" type="string" default="0" />
+
+    <aura:attribute name="styleMargin" type="string" default="" />
+
+   
+
+    <aura:attribute name="stylePaddingTop" type="string" default="" />
+
+    <aura:attribute name="stylePaddingRight" type="string" default="" />
+
+    <aura:attribute name="stylePaddingBottom" type="string" default="" />
+
+    <aura:attribute name="stylePaddingLeft" type="string" default="" />
+
+    <aura:attribute name="styleAsBlockFlag" type="string"  />
+
+   
+
+    <!-- Navigation -->
+
+    <!-- //used to provide event-based navigation via this component -->
+
+    <lightning:navigation aura:id="navService"/>
+
+    <aura:attribute name="destinationType" type="string"  />
+
+    <aura:attribute name="actionName" type="string"  />
+
+    <aura:attribute name="destinationRecordId" type="string"  />
+
+    <aura:attribute name="destinationObjectName" type="string"  />
+
+    <aura:attribute name="destinationPageName" type="string"  />
+
+    <aura:attribute name="destinationTabName" type="string"  />
+
+    <aura:attribute name="destinationObjectView" type="string"  />
+
+    <aura:attribute name="destinationWebUrl" type="string"  />
+
+    <aura:attribute name="destinationFlowTransition" type="string"  />
+
+    <aura:attribute name="label" type="string"/>
+
+    <aura:attribute name="fire" type="Boolean" default="false" />
+
+ 
+
+   
+
+    <!-- Internal -->
+
+    <aura:attribute name="imageSourceString" type="string"  />
+
+                <aura:attribute name="staticImageFlag" type="boolean"  />
+
+    <aura:attribute name="styleText" type="string" />
+
+ 
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+    
+
+                <span class="main" style="{!v.label.length ? 'display: inline-grid; min-width: 50%;' : ''}">
+
+        <img src="{! v.imageSourceString }" alt="{! v.imageAlt }"
+
+             style="{!v.styleText}" onclick="{!c.handleClick}"/>
+
+        <label style="display: inline-block; color: white; text-align: center;">{!v.label}</label>
+
+    </span>
+
+               
+
+ 
+
+</aura:component>
+
+ 
+
+Controller
+
+({
+
+                init : function(cmp, event, helper) {
+
+       
+
+        var name="$Resource." + cmp.get("v.imageName");
+
+        cmp.set("v.imageSourceString", $A.get(name));
+
+        helper.validateFlowNavigationInputs(cmp);
+
+       
+
+        var styleText = "";      
+
+        styleText=styleText + "border-radius:" + cmp.get("v.styleBorderRadius") + ";";
+
+        styleText=styleText + "border-style:" + cmp.get("v.styleBorderStyle") + ";";
+
+        styleText=styleText + "border-width:" + cmp.get("v.styleBorderWidth") + ";";
+
+                                styleText=styleText + "border-color:" + cmp.get("v.styleBorderColor") + ";";
+
+       
+
+        styleText=styleText + "margin-top:" + cmp.get("v.styleMarginTop") + ";";
+
+        styleText=styleText + "margin-right:" + cmp.get("v.styleMarginRight") + ";";
+
+        styleText=styleText + "margin-bottom:" + cmp.get("v.styleMarginBottom") + ";";
+
+        styleText=styleText + "margin-left:" + cmp.get("v.styleMarginLeft") + ";";
+
+        styleText=styleText + "margin:" + cmp.get("v.styleMargin") + ";";
+
+       
+
+        styleText=styleText + "padding-top:" + cmp.get("v.stylePaddingTop") + ";";
+
+        styleText=styleText + "padding-right:" + cmp.get("v.stylePaddingRight") + ";";
+
+        styleText=styleText + "padding-bottom:" + cmp.get("v.stylePaddingBottom") + ";";
+
+        styleText=styleText + "padding-left:" + cmp.get("v.stylePaddingLeft") + ";";     
+
+        
+
+        styleText=styleText + "width:" + cmp.get("v.styleWidth") + ";height:" + cmp.get("v.styleHeight") + ";";
+
+        styleText=styleText + "max-width:" + cmp.get("v.styleMaxWidth") + ";max-height:" + cmp.get("v.styleMaxHeight") + ";"; 
+
+        
+
+        //normally the use of span elements instead of div elements in the markup
+
+        //enables images to flow on the same screen.
+
+        //sometimes, though, you want to use the entire width and do things like centering.
+
+        //by setting this flag, the image span gets treated as a full-width block
+
+        if(cmp.get("v.styleAsBlockFlag") == "true")
+
+           styleText=styleText + "display:block;";
+
+       
+
+        cmp.set("v.styleText", styleText);
+
+       
+
+                },
+
+   
+
+    handleClick : function(cmp, event, helper) {
+
+        cmp.set("v.fire", true);
+
+        helper.navigateFlow(cmp, helper);
+
+        //console.log('fire [' + cmp.get("v.label2") + ']');
+
+    }
+
+})
+
+ 
+
+Helper
+
+({
+
+                validateFlowNavigationInputs : function(cmp) {
+
+                                //get all the inputs.
+
+        //check and see if there's either zero (no navigation upon click) or one input
+
+       
+
+        console.log("starting validation of input...");
+
+       var inputs = [];
+
+        inputs[1]=cmp.get("v.destinationRecordId");
+
+        inputs[2]=cmp.get("v.destinationObjectName");
+
+        inputs[3]=cmp.get("v.destinationPageName");
+
+        //inputs[4]=cmp.get("v.destinationTabName");
+
+        inputs[5]=cmp.get("v.destinationWebUrl");
+
+        inputs[6]=cmp.get("v.destinationFlowTransition");
+
+ 
+
+        const checker = (accumulator, currentValue) => {
+
+            var impact = 0;
+
+            console.log("currentValue is: " + currentValue);
+
+            if (currentValue != "" & !(currentValue === undefined)) {
+
+               console.log("accumulator is:" + accumulator);    
+
+               impact++;
+
+               console.log("impact is:" + impact);
+
+               }             
+
+            return accumulator + impact;
+
+              
+
+        }
+
+       
+
+        var totalInputs = inputs.reduce(checker, 0);
+
+        if (totalInputs > 1) {
+
+            alert("The destination code in this component requires you to specify no  more than one destination in your inputs. You didn't do that, and now bad things will happen. ");
+
+        }
+
+        if (totalInputs == 0) {
+
+            console.log("no destination inputs provided. this image will be static");
+
+            cmp.set("v.staticImageFlag", true);
+
+        }
+
+                },
+
+              
+
+    navigateFlow : function(cmp, helper) {
+
+        var self=helper;
+
+        var navService = cmp.find("navService");
+
+        //var destType =cmp.get("v.destinationType");
+
+        var destName = "";
+
+        var args = {};
+
+        var state = {};
+
+ 
+
+        var destRecordId = cmp.get("v.destinationRecordId");
+
+        if (destRecordId != "" && destRecordId) {
+
+            console.log("dstRecordId is not blank");
+
+            args["recordId"] = destRecordId;
+
+            var action = cmp.get("v.actionName");
+
+            //use view if nothing is specfied. that's mostly what people want.
+
+            args["actionName"] = (action != 'view' && action) ? action : "view";
+
+            destName = "standard__recordPage";
+
+        }   
+
+           
+
+        var objectApiName = cmp.get("v.destinationObjectName");
+
+        if ((objectApiName != "") && objectApiName) { 
+
+            //console.log("objectApiName is not blank:" + objectApiName);
+
+            args["objectApiName"] = objectApiName;
+
+            var action = cmp.get("v.actionName");
+
+            //use list if nothing is specfied.
+
+            args["actionName"] = (action != 'list' && action) ? action : "list";
+
+            destName = "standard__objectPage";   
+
+            
+
+            //allows a view name to be provided.
+
+            var viewName = cmp.get("v.destinationObjectView");
+
+            state["filterName"] = (viewName != 'recent' && viewName) ? viewName : "recent";
+
+                                }
+
+       
+
+        var pageName = cmp.get("v.destinationPageName");
+
+        if ((pageName != "") && pageName) { 
+
+            //console.log("objectApiName is not blank:" + objectApiName);
+
+            args["pageName"] = pageName;
+
+            destName = "standard__namedPage";   
+
+                                }
+
+       
+
+       
+
+        //var tabName = cmp.get("v.destinationTabName");
+
+        //if ((tabName != "") && tabName) { 
+
+        //    args["apiName"] = tabName;
+
+        //    destName = "standard__navItemPage";   
+
+        //}
+
+        var flowTransition = cmp.get("v.destinationFlowTransition");
+
+        if ((flowTransition != "") && flowTransition) {
+
+            var navigate = cmp.get("v.navigateFlow");
+
+            navigate(flowTransition.toUpperCase());
+
+        } else {
+
+             var targetUrl = cmp.get("v.destinationWebUrl");
+
+             if ((targetUrl != "") && targetUrl) { 
+
+                self.navigateToUrl(cmp, targetUrl);  
+
+             }
+
+             else {
+
+                var pageReference = {
+
+                    "type": destName,
+
+                    "attributes": args,
+
+                    "state": state
+
+                };
+
+                console.log(JSON.stringify(pageReference, null, 4));
+
+                navService.navigate(pageReference);
+
+             }
+
+           
+
+          }
+
+       
+
+    },
+
+   
+
+    navigateToUrl : function(cmp, destUrl) { 
+
+                               
+
+                    var pattern = new RegExp('^(http|https):\/\/[^ "]+$');
+
+                    /*if (!pattern.test(destUrl)) {
+
+                                                destUrl = 'http://' + destUrl;
+
+        }
+
+        else {
+
+            alert("invalid URL provided to imageButton component in flow");
+
+        }*/
+
+ 
+
+                    var urlEvent = $A.get("e.force:navigateToURL");
+
+                    if(urlEvent) {
+
+            urlEvent.setParams({
+
+                    "url": destUrl
+
+            });
+
+           
+
+               urlEvent.fire();
+
+            console.log(destUrl);
+
+            console.log(urlEvent);
+
+            window.open(destUrl, '_blank');
+
+           
+
+        } else {
+
+            console.log("Else");
+
+                }
+
+       
+
+        
+
+                }
+
+   
+
+    
+
+           
+
+})
+
+ 
+
+Design
+
+ 
+
+<design:component>
+
+    <design:attribute name="imageName" label="staticResource name" required="true"/>
+
+    <design:attribute name="imageAlt" label="image Alt Text"/>
+
+ 
+
+    <design:attribute name="styleWidth" label ="styleWidth" />
+
+    <design:attribute name="styleHeight" label ="styleHeight" />
+
+    <design:attribute name="styleMaxWidth" label ="styleMaxWidth" />
+
+    <design:attribute name="styleMaxHeight" label ="styleMaxHeight" />
+
+   
+
+    <design:attribute name="styleText" label="composite Style String"/>
+
+    <design:attribute name="styleBorderRadius" label ="styleBorderRadius" />
+
+    <design:attribute name="styleBorderStyle" label ="styleBorderStyle" />
+
+    <design:attribute name="styleBorderWidth" label ="styleBorderWidth" />
+
+    <design:attribute name="styleBorderColor" label ="styleBorderColor" />
+
+    <design:attribute name="styleMarginTop" label ="styleMarginTop" />
+
+    <design:attribute name="styleMarginRight" label ="styleMarginRight" />
+
+    <design:attribute name="styleMarginBottom" label ="styleMarginBottom" />
+
+    <design:attribute name="styleMarginLeft" label ="styleMarginLeft" />
+
+    <design:attribute name="styleMargin" label ="styleMargin" />
+
+   
+
+    <design:attribute name="stylePaddingTop" label ="stylePaddingTop" />
+
+    <design:attribute name="stylePaddingRight" label ="stylePaddingRight" />
+
+    <design:attribute name="stylePaddingBottom" label ="stylePaddingBottom" />
+
+    <design:attribute name="stylePaddingLeft" label ="stylePaddingLeft" />
+
+   
+
+    <design:attribute name="styleAsBlockFlag" label ="styleDisplayAsBlock" />
+
+   
+
+    <!-- //used to provide event-based navigation -->
+
+ 
+
+    <design:attribute name="fire" label="Button Clicked?"/>
+
+    <design:attribute name="destinationRecordId" label="destRecordId"  />
+
+    <design:attribute name="destinationObjectName" label="destObjectName"  />
+
+    <design:attribute name="destinationPageName" label="destPageName"  />
+
+    <design:attribute name="destinationTabName" label="destTabName"  />
+
+    <design:attribute name="destinationObjectView" label="destObjectView"  />
+
+    <design:attribute name="destinationWebUrl" label="destWebUrl"  />
+
+    <design:attribute name="destinationFlowTransition" label="destFlowTransition"  />
+
+   
+
+    <design:attribute name="actionName" label="action name"/>
+
+    <design:attribute name="label" label="Label"/>
+
+   
+
+    
+
+</design:component>
