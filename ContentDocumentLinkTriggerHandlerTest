@@ -1,0 +1,48 @@
+@IsTest
+public with sharing class ContentDocumentLinkTriggerHandlerTest {
+    
+    @IsTest
+    static void testMethod1(){
+    
+            Branch__c br = [SELECT Id FROM Branch__c LIMIT 1][0];
+
+        HC_Order__c hcOrder1= new HC_Order__c (
+            Name = 'test1',
+            OrderStatus__c = '1',
+            Assigned_Branch__c=br.Id
+        );
+        insert hcOrder1;
+
+        HC_Order__c  hcOrder2 = new HC_Order__c (
+            Name = 'test2',
+            OrderStatus__c = '1',
+            Assigned_Branch__c=br.Id
+
+        );
+        insert hcOrder2;
+        
+        ContentVersion cv = new ContentVersion(Title = 'Test 999 IO',
+                                               PathOnClient = 'Test.pdf',
+                                               VersionData = Blob.valueOf('Test Content Data'),
+                                               IsMajorVersion = true);
+        insert cv;
+        
+        ContentDocument cd = [SELECT Id, Title FROM ContentDocument WHERE Title = 'Test 999 IO' LIMIT 1][0];
+        
+        ContentDocumentLink contentDocumentLink1 = new ContentDocumentLink(
+            ContentDocumentId = cd.id,
+            LinkedEntityId = hcOrder1.id
+        );
+        ContentDocumentLink contentDocumentLink2 = new ContentDocumentLink(
+            ContentDocumentId = cd.id,
+            LinkedEntityId = hcOrder2.id
+        );
+        insert new List<ContentDocumentLink>{contentDocumentLink1, contentDocumentLink2};
+            
+        HC_Order__c  hcOrder1Result = [SELECT Id, File_Uploaded__c FROM HC_Order__c  WHERE Id = :hcOrder1.id];
+        HC_Order__c  hcOrder2Result = [SELECT Id, File_Uploaded__c FROM HC_Order__c  WHERE Id = :hcOrder2.id];
+
+        System.assertEquals(true, hcOrder1Result.File_Uploaded__c);
+        System.assertEquals(true, hcOrder2Result.File_Uploaded__c);
+    }
+}
